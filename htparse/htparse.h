@@ -1,6 +1,15 @@
 #ifndef __HTPARSE_H__
 #define __HTPARSE_H__
 
+#ifdef _MSC_VER
+#ifndef __cplusplus
+#define inline __inline
+#endif
+#define ssize_t int
+#define strcasecmp stricmp
+#define snprintf _snprintf
+#endif
+
 struct htparser;
 
 enum htp_type {

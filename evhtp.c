@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <signal.h>
+#ifndef _WIN32
 #include <strings.h>
 #include <inttypes.h>
 #include <sys/socket.h>
@@ -13,6 +14,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
+#endif
 #include <sys/tree.h>
 
 #include "evhtp.h"
@@ -210,7 +212,9 @@ status_code_to_str(evhtp_res code) {
 /**
  * @brief callback definitions for request processing from libhtparse
  */
+
 static htparse_hooks request_psets = {
+#ifndef _MSC_VER
     .on_msg_begin       = _evhtp_request_parser_start,
     .method             = NULL,
     .scheme             = NULL,
@@ -229,6 +233,27 @@ static htparse_hooks request_psets = {
     .on_chunks_complete = _evhtp_request_parser_chunks_fini,
     .body               = _evhtp_request_parser_body,
     .on_msg_complete    = _evhtp_request_parser_fini
+#else
+    _evhtp_request_parser_start,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    _evhtp_request_parser_path,
+    _evhtp_request_parser_args,
+    NULL,
+    _evhtp_request_parser_headers_start,
+    _evhtp_request_parser_header_key,
+    _evhtp_request_parser_header_val,
+    _evhtp_request_parser_hostname,
+    _evhtp_request_parser_headers,
+    _evhtp_request_parser_chunk_new,
+    _evhtp_request_parser_chunk_fini,
+    _evhtp_request_parser_chunks_fini,
+    _evhtp_request_parser_body,
+    _evhtp_request_parser_fini
+
+#endif
 };
 
 #ifndef EVHTP_DISABLE_SSL
@@ -578,26 +603,26 @@ _evhtp_callback_find(evhtp_callbacks_t * cbs,
                 if (strcmp(callback->val.path, path) == 0) {
                     *start_offset = 0;
                     *end_offset   = (unsigned int)strlen(path);
-                    return callback;
-                }
+                return callback;
+            }
                 break;
 #ifndef EVHTP_DISABLE_REGEX
             case evhtp_callback_type_regex:
-                if (regexec(callback->val.regex, path, callback->val.regex->re_nsub + 1, pmatch, 0) == 0) {
+            if (regexec(callback->val.regex, path, callback->val.regex->re_nsub + 1, pmatch, 0) == 0) {
                     *start_offset = pmatch[callback->val.regex->re_nsub].rm_so;
                     *end_offset   = pmatch[callback->val.regex->re_nsub].rm_eo;
 
-                    return callback;
-                }
+                return callback;
+            }
 
                 break;
 #endif
             case evhtp_callback_type_glob:
                 if (_evhtp_glob_match(callback->val.glob, path) == 1) {
-                    *start_offset = 0;
-                    *end_offset   = (unsigned int)strlen(path);
-                    return callback;
-                }
+        *start_offset = 0;
+        *end_offset   = (unsigned int)strlen(path);
+        return callback;
+    }
             default:
                 break;
         } /* switch */
@@ -695,8 +720,8 @@ _evhtp_uri_free(evhtp_uri_t * uri) {
     evhtp_query_free(uri->query);
     _evhtp_path_free(uri->path);
 
-    free(uri->fragment);
-    free(uri->query_raw);
+        free(uri->fragment);
+        free(uri->query_raw);
     free(uri);
 }
 
@@ -808,12 +833,12 @@ _evhtp_path_free(evhtp_path_t * path) {
         return;
     }
 
-    free(path->full);
+        free(path->full);
 
-    free(path->path);
-    free(path->file);
-    free(path->match_start);
-    free(path->match_end);
+        free(path->path);
+        free(path->file);
+        free(path->match_start);
+        free(path->match_end);
 
     free(path);
 }
@@ -1345,12 +1370,11 @@ _evhtp_connection_readcb(evbev_t * bev, void * arg) {
         c->request->status = EVHTP_RES_OK;
     }
 
-
-    buf = evbuffer_pullup(bufferevent_get_input(bev), avail);
+    buf   = evbuffer_pullup(bufferevent_get_input(bev), avail);
 
     bufferevent_disable(bev, EV_WRITE);
     {
-        nread = htparser_run(c->parser, &request_psets, (const char *)buf, avail);
+    nread = htparser_run(c->parser, &request_psets, (const char *)buf, avail);
     }
     bufferevent_enable(bev, EV_WRITE);
 
@@ -1415,7 +1439,7 @@ _evhtp_connection_writecb(evbev_t * bev, void * arg) {
     if (c->request->keepalive) {
         _evhtp_request_free(c->request);
 
-        c->request         = NULL;
+        c->request = NULL;
         c->body_bytes_read = 0;
 
         if (c->htp->parent && c->vhost_via_sni == 0) {
@@ -1430,7 +1454,6 @@ _evhtp_connection_writecb(evbev_t * bev, void * arg) {
         }
 
         htparser_init(c->parser, htp_type_request);
-
 
         htparser_set_userdata(c->parser, c);
         return;
@@ -2161,8 +2184,8 @@ evhtp_parse_query(const char * query, size_t len) {
     query_parser_state state   = s_query_start;
     char             * key_buf = NULL;
     char             * val_buf = NULL;
-    int                key_idx;
-    int                val_idx;
+    size_t             key_idx;
+    size_t             val_idx;
     int                res;
     unsigned char      ch;
     size_t             i;
@@ -2246,9 +2269,9 @@ query_key:
                     /* not hex, so we treat as a normal key */
                     if ((key_idx + 2) >= len) {
                         /* we need to insert \%<ch>, but not enough space */
-                        res = -1;
-                        goto error;
-                    }
+                    res = -1;
+                    goto error;
+                }
 
                     key_buf[key_idx - 1] = '%';
                     key_buf[key_idx++]   = ch;
@@ -2306,9 +2329,9 @@ query_key:
                     /* not really a hex val */
                     if ((val_idx + 2) >= len) {
                         /* we need to insert \%<ch>, but not enough space */
-                        res = -1;
-                        goto error;
-                    }
+                    res = -1;
+                    goto error;
+                }
 
 
                     val_buf[val_idx - 1] = '%';
@@ -2346,13 +2369,13 @@ query_key:
         evhtp_kvs_add_kv(query_args, evhtp_kv_new(key_buf, val_buf, 1, 1));
     }
 
-    free(key_buf);
-    free(val_buf);
+        free(key_buf);
+        free(val_buf);
 
     return query_args;
 error:
-    free(key_buf);
-    free(val_buf);
+        free(key_buf);
+        free(val_buf);
 
     return NULL;
 }     /* evhtp_parse_query */
@@ -2387,7 +2410,7 @@ evhtp_send_reply_end(evhtp_request_t * request) {
     request->finished = 1;
 
     _evhtp_connection_writecb(evhtp_request_get_bev(request),
-                              evhtp_request_get_connection(request));
+                                     evhtp_request_get_connection(request));
 }
 
 void
@@ -2522,7 +2545,9 @@ evhtp_unbind_socket(evhtp_t * htp) {
 
 int
 evhtp_bind_sockaddr(evhtp_t * htp, struct sockaddr * sa, size_t sin_len, int backlog) {
+#ifndef _WIN32
     signal(SIGPIPE, SIG_IGN);
+#endif
 
     htp->server = evconnlistener_new_bind(htp->evbase, _evhtp_accept_cb, (void *)htp,
                                           LEV_OPT_THREADSAFE | LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE,
@@ -2669,14 +2694,14 @@ evhtp_callback_free(evhtp_callback_t * callback) {
 
     switch (callback->type) {
         case evhtp_callback_type_hash:
-            free(callback->val.path);
+                free(callback->val.path);
             break;
         case evhtp_callback_type_glob:
-            free(callback->val.glob);
+                free(callback->val.glob);
             break;
 #ifndef EVHTP_DISABLE_REGEX
         case evhtp_callback_type_regex:
-            regfree(callback->val.regex);
+                regfree(callback->val.regex);
             free(callback->val.regex);
             break;
 #endif
@@ -3106,7 +3131,7 @@ evhtp_ssl_init(evhtp_t * htp, evhtp_ssl_cfg_t * cfg) {
                                 cfg->privfile ? cfg->privfile : cfg->pemfile, SSL_FILETYPE_PEM);
 
     SSL_CTX_set_session_id_context(htp->ssl_ctx,
-                                   (void *)&session_id_context,
+                                   (void*)&session_id_context,
                                    sizeof(session_id_context));
 
     SSL_CTX_set_app_data(htp->ssl_ctx, htp);
@@ -3186,7 +3211,7 @@ evhtp_request_get_connection(evhtp_request_t * request) {
 }
 
 void
-evhtp_connection_set_timeouts(evhtp_connection_t   * c,
+evhtp_connection_set_timeouts(evhtp_connection_t * c,
                               const struct timeval * rtimeo,
                               const struct timeval * wtimeo) {
     if (!c) {
@@ -3219,7 +3244,7 @@ evhtp_connection_free(evhtp_connection_t * connection) {
     _evhtp_request_free(connection->request);
     _evhtp_connection_fini_hook(connection);
 
-    free(connection->parser);
+        free(connection->parser);
     free(connection->hooks);
     free(connection->saddr);
 
@@ -3343,7 +3368,7 @@ evhtp_add_vhost(evhtp_t * evhtp, const char * name, evhtp_t * vhost) {
      * This allows for a keep-alive connection to make multiple requests with
      * different Host: values.
      */
-    vhost->parent                 = evhtp;
+    vhost->parent = evhtp;
 
     /* inherit various flags from the parent evhtp structure */
     vhost->bev_flags              = evhtp->bev_flags;
@@ -3390,11 +3415,13 @@ evhtp_free(evhtp_t * evhtp) {
     if (evhtp == NULL) {
         return;
     }
-
+	
+#ifndef EVHTP_DISABLE_EVTHR
     if (evhtp->thr_pool) {
         evthr_pool_stop(evhtp->thr_pool);
         evthr_pool_free(evhtp->thr_pool);
     }
+#endif
 
     if (evhtp->callbacks) {
         free(evhtp->callbacks);

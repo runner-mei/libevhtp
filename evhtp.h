@@ -71,7 +71,7 @@ typedef struct evhtp_connection_s evhtp_connection_t;
 typedef struct evhtp_ssl_cfg_s    evhtp_ssl_cfg_t;
 typedef struct evhtp_alias_s      evhtp_alias_t;
 typedef uint16_t                  evhtp_res;
-typedef uint8_t                   evhtp_error_flags;
+typedef short                   evhtp_error_flags;
 
 
 #define evhtp_header_s  evhtp_kv_s
@@ -164,70 +164,70 @@ typedef void * (*evhtp_ssl_scache_init)(evhtp_t *);
 #define EVHTP_VERSION_MINOR     1
 #define EVHTP_VERSION_PATCH     5
 
-#define evhtp_headers_iterator  evhtp_kvs_iterator
+#define evhtp_headers_iterator evhtp_kvs_iterator
 
-#define EVHTP_RES_ERROR         0
-#define EVHTP_RES_PAUSE         1
-#define EVHTP_RES_FATAL         2
-#define EVHTP_RES_USER          3
+#define EVHTP_RES_ERROR        0
+#define EVHTP_RES_PAUSE        1
+#define EVHTP_RES_FATAL        2
+#define EVHTP_RES_USER         3
 #define EVHTP_RES_DATA_TOO_LONG 4
-#define EVHTP_RES_OK            200
+#define EVHTP_RES_OK           200
 
-#define EVHTP_RES_100           100
-#define EVHTP_RES_CONTINUE      100
-#define EVHTP_RES_SWITCH_PROTO  101
-#define EVHTP_RES_PROCESSING    102
-#define EVHTP_RES_URI_TOOLONG   122
+#define EVHTP_RES_100          100
+#define EVHTP_RES_CONTINUE     100
+#define EVHTP_RES_SWITCH_PROTO 101
+#define EVHTP_RES_PROCESSING   102
+#define EVHTP_RES_URI_TOOLONG  122
 
-#define EVHTP_RES_200           200
-#define EVHTP_RES_CREATED       201
-#define EVHTP_RES_ACCEPTED      202
-#define EVHTP_RES_NAUTHINFO     203
-#define EVHTP_RES_NOCONTENT     204
-#define EVHTP_RES_RSTCONTENT    205
-#define EVHTP_RES_PARTIAL       206
-#define EVHTP_RES_MSTATUS       207
-#define EVHTP_RES_IMUSED        226
+#define EVHTP_RES_200          200
+#define EVHTP_RES_CREATED      201
+#define EVHTP_RES_ACCEPTED     202
+#define EVHTP_RES_NAUTHINFO    203
+#define EVHTP_RES_NOCONTENT    204
+#define EVHTP_RES_RSTCONTENT   205
+#define EVHTP_RES_PARTIAL      206
+#define EVHTP_RES_MSTATUS      207
+#define EVHTP_RES_IMUSED       226
 
-#define EVHTP_RES_300           300
-#define EVHTP_RES_MCHOICE       300
-#define EVHTP_RES_MOVEDPERM     301
-#define EVHTP_RES_FOUND         302
-#define EVHTP_RES_SEEOTHER      303
-#define EVHTP_RES_NOTMOD        304
-#define EVHTP_RES_USEPROXY      305
-#define EVHTP_RES_SWITCHPROXY   306
-#define EVHTP_RES_TMPREDIR      307
+#define EVHTP_RES_300          300
+#define EVHTP_RES_MCHOICE      300
+#define EVHTP_RES_MOVEDPERM    301
+#define EVHTP_RES_FOUND        302
+#define EVHTP_RES_SEEOTHER     303
+#define EVHTP_RES_NOTMOD       304
+#define EVHTP_RES_USEPROXY     305
+#define EVHTP_RES_SWITCHPROXY  306
+#define EVHTP_RES_TMPREDIR     307
 
-#define EVHTP_RES_400           400
-#define EVHTP_RES_BADREQ        400
-#define EVHTP_RES_UNAUTH        401
-#define EVHTP_RES_PAYREQ        402
-#define EVHTP_RES_FORBIDDEN     403
-#define EVHTP_RES_NOTFOUND      404
-#define EVHTP_RES_METHNALLOWED  405
-#define EVHTP_RES_NACCEPTABLE   406
-#define EVHTP_RES_PROXYAUTHREQ  407
-#define EVHTP_RES_TIMEOUT       408
-#define EVHTP_RES_CONFLICT      409
-#define EVHTP_RES_GONE          410
-#define EVHTP_RES_LENREQ        411
-#define EVHTP_RES_PRECONDFAIL   412
-#define EVHTP_RES_ENTOOLARGE    413
-#define EVHTP_RES_URITOOLARGE   414
-#define EVHTP_RES_UNSUPPORTED   415
-#define EVHTP_RES_RANGENOTSC    416
-#define EVHTP_RES_EXPECTFAIL    417
-#define EVHTP_RES_IAMATEAPOT    418
+#define EVHTP_RES_400          400
+#define EVHTP_RES_BADREQ       400
+#define EVHTP_RES_UNAUTH       401
+#define EVHTP_RES_PAYREQ       402
+#define EVHTP_RES_FORBIDDEN    403
+#define EVHTP_RES_NOTFOUND     404
+#define EVHTP_RES_METHNALLOWED 405
+#define EVHTP_RES_NACCEPTABLE  406
+#define EVHTP_RES_PROXYAUTHREQ 407
+#define EVHTP_RES_TIMEOUT      408
+#define EVHTP_RES_CONFLICT     409
+#define EVHTP_RES_GONE         410
+#define EVHTP_RES_LENREQ       411
+#define EVHTP_RES_PRECONDFAIL  412
+#define EVHTP_RES_ENTOOLARGE   413
+#define EVHTP_RES_URITOOLARGE  414
+#define EVHTP_RES_UNSUPPORTED  415
+#define EVHTP_RES_RANGENOTSC   416
+#define EVHTP_RES_EXPECTFAIL   417
+#define EVHTP_RES_IAMATEAPOT   418
 
-#define EVHTP_RES_500           500
-#define EVHTP_RES_SERVERR       500
-#define EVHTP_RES_NOTIMPL       501
-#define EVHTP_RES_BADGATEWAY    502
-#define EVHTP_RES_SERVUNAVAIL   503
-#define EVHTP_RES_GWTIMEOUT     504
-#define EVHTP_RES_VERNSUPPORT   505
-#define EVHTP_RES_BWEXEED       509
+#define EVHTP_RES_500          500
+#define EVHTP_RES_SERVERR      500
+#define EVHTP_RES_NOTIMPL      501
+#define EVHTP_RES_BADGATEWAY   502
+#define EVHTP_RES_SERVUNAVAIL  503
+#define EVHTP_RES_GWTIMEOUT    504
+#define EVHTP_RES_VERNSUPPORT  505
+#define EVHTP_RES_BWEXEED      509
 
 struct evhtp_defaults_s {
     evhtp_callback_cb    cb;
@@ -500,9 +500,9 @@ void      evhtp_free(evhtp_t * evhtp);
  * @param w write-timeout in timeval.
  */
 void evhtp_set_timeouts(evhtp_t * htp, const struct timeval * r, const struct timeval * w);
-void evhtp_set_bev_flags(evhtp_t * htp, int flags);
-int  evhtp_ssl_use_threads(void);
-int  evhtp_ssl_init(evhtp_t * htp, evhtp_ssl_cfg_t * ssl_cfg);
+void      evhtp_set_bev_flags(evhtp_t * htp, int flags);
+int       evhtp_ssl_use_threads(void);
+int       evhtp_ssl_init(evhtp_t * htp, evhtp_ssl_cfg_t * ssl_cfg);
 
 
 /**
@@ -630,7 +630,7 @@ int evhtp_unset_hook(evhtp_hooks_t ** hooks, evhtp_hook_type type);
  *
  * @return
  */
-int evhtp_unset_all_hooks(evhtp_hooks_t ** hooks);
+int  evhtp_unset_all_hooks(evhtp_hooks_t ** hooks);
 
 
 /**
@@ -648,7 +648,7 @@ int evhtp_unset_all_hooks(evhtp_hooks_t ** hooks);
  *
  * @return
  */
-int evhtp_bind_socket(evhtp_t * htp, const char * addr, uint16_t port, int backlog);
+int  evhtp_bind_socket(evhtp_t * htp, const char * addr, uint16_t port, int backlog);
 
 
 /**
@@ -671,7 +671,9 @@ void evhtp_unbind_socket(evhtp_t * htp);
 int  evhtp_bind_sockaddr(evhtp_t * htp, struct sockaddr *, size_t sin_len, int backlog);
 
 int  evhtp_use_threads(evhtp_t * htp, evhtp_thread_init_cb init_cb, int nthreads, void * arg);
+
 void evhtp_send_reply(evhtp_request_t * request, evhtp_res code);
+
 void evhtp_send_reply_start(evhtp_request_t * request, evhtp_res code);
 void evhtp_send_reply_body(evhtp_request_t * request, evbuf_t * buf);
 void evhtp_send_reply_end(evhtp_request_t * request);
@@ -682,7 +684,7 @@ void evhtp_send_reply_end(evhtp_request_t * request);
  * @return 1 if the response MUST have a body; 0 if the response MUST NOT have
  *     a body.
  */
-int evhtp_response_needs_body(const evhtp_res code, const htp_method method);
+int  evhtp_response_needs_body(const evhtp_res code, const htp_method method);
 
 
 /**
