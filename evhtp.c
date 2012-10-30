@@ -3037,6 +3037,7 @@ evhtp_ssl_init(evhtp_t * htp, evhtp_ssl_cfg_t * cfg) {
     evhtp_ssl_scache_add  add_cb  = NULL;
     evhtp_ssl_scache_get  get_cb  = NULL;
     evhtp_ssl_scache_del  del_cb  = NULL;
+	STACK_OF(SSL_COMP)   *comp_methods;
 
     if (cfg == NULL || htp == NULL || cfg->pemfile == NULL) {
         return -1;
@@ -3046,7 +3047,7 @@ evhtp_ssl_init(evhtp_t * htp, evhtp_ssl_cfg_t * cfg) {
     SSL_load_error_strings();
     RAND_poll();
 
-    STACK_OF(SSL_COMP) * comp_methods = SSL_COMP_get_compression_methods();
+	comp_methods = SSL_COMP_get_compression_methods();
     sk_SSL_COMP_zero(comp_methods);
 
     htp->ssl_cfg = cfg;
